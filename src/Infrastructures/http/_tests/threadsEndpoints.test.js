@@ -1,7 +1,6 @@
 const UsersTableTestHelper = require('../../../../tests/helpers/UsersTableTestHelper');
 const ThreadsTableTestHelper = require('../../../../tests/helpers/ThreadsTableTestHelper');
 const ThreadCommentsTableTestHelper = require('../../../../tests/helpers/ThreadCommentsTableTestHelper');
-const UserThreadCommentLikesTableTestHelper = require('../../../../tests/helpers/UserThreadCommentLikesTableTestHelper');
 const IdGeneratorImpl = require('../../utilities/IdGeneratorImpl');
 const DatetimeImpl = require('../../utilities/DatetimeImpl');
 const pool = require('../../databases/postgres/pool');
@@ -13,7 +12,6 @@ describe('A Thread Endpoints', () => {
     await UsersTableTestHelper.cleanTable();
     await ThreadsTableTestHelper.cleanTable();
     await ThreadCommentsTableTestHelper.cleanTable();
-    await UserThreadCommentLikesTableTestHelper.cleanTable();
   });
 
   afterAll(async () => {
