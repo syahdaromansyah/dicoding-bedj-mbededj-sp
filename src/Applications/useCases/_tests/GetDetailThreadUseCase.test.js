@@ -2,6 +2,7 @@ const DetailThreadEntity = require('../../../Domains/detailThread/entities/Detai
 const ThreadsRepository = require('../../../Domains/threads/ThreadsRepository');
 const ThreadCommentsRepository = require('../../../Domains/threadComments/ThreadCommentsRepository');
 const ThreadCommentRepliesRepository = require('../../../Domains/threadCommentReplies/ThreadCommentRepliesRepository');
+const UserThreadCommentLikesRepository = require('../../../Domains/userThreadCommentLikes/UserThreadCommentLikesRepository');
 const GetDetailThreadUseCase = require('../GetDetailThreadUseCase');
 
 describe('A GetDetailThreadUseCase Use Case', () => {
@@ -22,6 +23,7 @@ describe('A GetDetailThreadUseCase Use Case', () => {
             content: 'foobaz comment',
             date: new Date('2024-12-2').toISOString(),
             isDelete: false,
+            likeCount: 4,
             username: 'foobaz',
           },
           {
@@ -29,6 +31,7 @@ describe('A GetDetailThreadUseCase Use Case', () => {
             content: 'voobar comment',
             date: new Date('2024-12-3').toISOString(),
             isDelete: false,
+            likeCount: 2,
             username: 'voobar',
           },
           {
@@ -36,6 +39,7 @@ describe('A GetDetailThreadUseCase Use Case', () => {
             content: 'voobaz comment',
             date: new Date('2024-12-4').toISOString(),
             isDelete: true,
+            likeCount: 0,
             username: 'voobaz',
           },
         ],
@@ -71,6 +75,26 @@ describe('A GetDetailThreadUseCase Use Case', () => {
             isDelete: true,
             replyCommentId: 'comment-2',
             username: 'voobaz',
+          },
+        ],
+        userThreadCommentsLikes: [
+          {
+            threadCommentId: 'comment-1',
+          },
+          {
+            threadCommentId: 'comment-1',
+          },
+          {
+            threadCommentId: 'comment-1',
+          },
+          {
+            threadCommentId: 'comment-1',
+          },
+          {
+            threadCommentId: 'comment-2',
+          },
+          {
+            threadCommentId: 'comment-2',
           },
         ],
       }),
@@ -155,10 +179,37 @@ describe('A GetDetailThreadUseCase Use Case', () => {
         },
       ]);
 
+    const userThreadCommentLikesRepository =
+      new UserThreadCommentLikesRepository();
+
+    userThreadCommentLikesRepository.getByThreadId = jest
+      .fn()
+      .mockResolvedValueOnce([
+        {
+          threadCommentId: 'comment-1',
+        },
+        {
+          threadCommentId: 'comment-1',
+        },
+        {
+          threadCommentId: 'comment-1',
+        },
+        {
+          threadCommentId: 'comment-1',
+        },
+        {
+          threadCommentId: 'comment-2',
+        },
+        {
+          threadCommentId: 'comment-2',
+        },
+      ]);
+
     const getDetailThreadUseCase = new GetDetailThreadUseCase({
       threadsRepository,
       threadCommentsRepository,
       threadCommentRepliesRepository,
+      userThreadCommentLikesRepository,
     });
 
     // Action & Assert
@@ -193,5 +244,13 @@ describe('A GetDetailThreadUseCase Use Case', () => {
     expect(
       threadCommentRepliesRepository.getManyWithUsernameByThreadId,
     ).toHaveBeenCalledWith('thread-1');
+
+    expect(
+      userThreadCommentLikesRepository.getByThreadId,
+    ).toHaveBeenCalledTimes(1);
+
+    expect(userThreadCommentLikesRepository.getByThreadId).toHaveBeenCalledWith(
+      'thread-1',
+    );
   });
 });

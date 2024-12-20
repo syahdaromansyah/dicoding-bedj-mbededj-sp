@@ -1,6 +1,8 @@
+const { nanoid } = require('nanoid');
 const UsersTableTestHelper = require('../../../../tests/helpers/UsersTableTestHelper');
 const ThreadsTableTestHelper = require('../../../../tests/helpers/ThreadsTableTestHelper');
 const ThreadCommentsTableTestHelper = require('../../../../tests/helpers/ThreadCommentsTableTestHelper');
+const UserThreadCommentLikesTableTestHelper = require('../../../../tests/helpers/UserThreadCommentLikesTableTestHelper');
 const IdGeneratorImpl = require('../../utilities/IdGeneratorImpl');
 const DatetimeImpl = require('../../utilities/DatetimeImpl');
 const pool = require('../../databases/postgres/pool');
@@ -12,6 +14,7 @@ describe('A Thread Endpoints', () => {
     await UsersTableTestHelper.cleanTable();
     await ThreadsTableTestHelper.cleanTable();
     await ThreadCommentsTableTestHelper.cleanTable();
+    await UserThreadCommentLikesTableTestHelper.cleanTable();
   });
 
   afterAll(async () => {
@@ -429,7 +432,8 @@ describe('A Thread Endpoints', () => {
           .mockReturnValueOnce('rpy1'.padEnd(21, 'z'))
           .mockReturnValueOnce('rpy2'.padEnd(21, 'z'))
           .mockReturnValueOnce('rpy3'.padEnd(21, 'z'))
-          .mockReturnValueOnce('rpy4'.padEnd(21, 'z'));
+          .mockReturnValueOnce('rpy4'.padEnd(21, 'z'))
+          .mockImplementation(() => nanoid(21));
 
         const mockedDatetime = jest
           .spyOn(DatetimeImpl.prototype, 'now')
@@ -582,6 +586,55 @@ describe('A Thread Endpoints', () => {
           },
         });
 
+        // > Users are like thread comments
+        await server.inject({
+          method: 'PUT',
+          url: `/threads/${addedThdResJson.data.addedThread.id}/comments/${addedThdCmt1ResJson.data.addedComment.id}/likes`,
+          headers: {
+            authorization: `Bearer ${user1LoginResJson.data.accessToken}`,
+          },
+        });
+
+        await server.inject({
+          method: 'PUT',
+          url: `/threads/${addedThdResJson.data.addedThread.id}/comments/${addedThdCmt1ResJson.data.addedComment.id}/likes`,
+          headers: {
+            authorization: `Bearer ${user2LoginResJson.data.accessToken}`,
+          },
+        });
+
+        await server.inject({
+          method: 'PUT',
+          url: `/threads/${addedThdResJson.data.addedThread.id}/comments/${addedThdCmt1ResJson.data.addedComment.id}/likes`,
+          headers: {
+            authorization: `Bearer ${user3LoginResJson.data.accessToken}`,
+          },
+        });
+
+        await server.inject({
+          method: 'PUT',
+          url: `/threads/${addedThdResJson.data.addedThread.id}/comments/${addedThdCmt1ResJson.data.addedComment.id}/likes`,
+          headers: {
+            authorization: `Bearer ${user4LoginResJson.data.accessToken}`,
+          },
+        });
+
+        await server.inject({
+          method: 'PUT',
+          url: `/threads/${addedThdResJson.data.addedThread.id}/comments/${addedThdCmt2ResJson.data.addedComment.id}/likes`,
+          headers: {
+            authorization: `Bearer ${user1LoginResJson.data.accessToken}`,
+          },
+        });
+
+        await server.inject({
+          method: 'PUT',
+          url: `/threads/${addedThdResJson.data.addedThread.id}/comments/${addedThdCmt2ResJson.data.addedComment.id}/likes`,
+          headers: {
+            authorization: `Bearer ${user2LoginResJson.data.accessToken}`,
+          },
+        });
+
         // Action
         const detailThreadRes = await server.inject({
           method: 'GET',
@@ -606,6 +659,7 @@ describe('A Thread Endpoints', () => {
               id: 'comment-cmt1'.padEnd(29, 'z'),
               content: 'foobaz comment',
               date: new Date(2024, 11, 8, 14, 30, 15).toISOString(),
+              likeCount: 4,
               username: 'foobaz',
               replies: [
                 {
@@ -626,6 +680,7 @@ describe('A Thread Endpoints', () => {
               id: 'comment-cmt2'.padEnd(29, 'z'),
               content: 'voobar comment',
               date: new Date(2024, 11, 8, 15, 30, 15).toISOString(),
+              likeCount: 2,
               username: 'voobar',
               replies: [
                 {
@@ -646,13 +701,14 @@ describe('A Thread Endpoints', () => {
               id: 'comment-cmt3'.padEnd(29, 'z'),
               content: '**komentar telah dihapus**',
               date: new Date(2024, 11, 8, 16, 30, 15).toISOString(),
+              likeCount: 0,
               username: 'voobaz',
               replies: [],
             },
           ],
         });
 
-        expect(mockedIdGenerator).toHaveBeenCalledTimes(8);
+        expect(mockedIdGenerator).toHaveBeenCalledTimes(14);
 
         expect(mockedIdGenerator).toHaveBeenCalledWith(21);
 

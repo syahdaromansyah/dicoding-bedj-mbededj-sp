@@ -1,5 +1,10 @@
 class DetailThread {
-  constructor({ thread, threadComments, threadCommentReplies }) {
+  constructor({
+    thread,
+    threadComments,
+    threadCommentReplies,
+    userThreadCommentsLikes,
+  }) {
     this.id = thread.id;
     this.title = thread.title;
     this.body = thread.body;
@@ -9,13 +14,21 @@ class DetailThread {
     this.comments = this._arrangeCommentsDetail(
       threadComments,
       threadCommentReplies,
+      userThreadCommentsLikes,
     );
   }
 
-  _arrangeCommentsDetail(threadComments, threadCommentReplies) {
+  _arrangeCommentsDetail(
+    threadComments,
+    threadCommentReplies,
+    userThreadCommentsLikes,
+  ) {
     let tcrCopied = JSON.parse(JSON.stringify(threadCommentReplies));
+    let utclCopied = JSON.parse(JSON.stringify(userThreadCommentsLikes));
 
     return threadComments.map((tC) => {
+      utclCopied = utclCopied.filter((utcl) => utcl.threadCommentId !== tC.id);
+
       const replies = tcrCopied
         .filter((tCR) => tCR.replyCommentId === tC.id)
         .map((tCR) => ({

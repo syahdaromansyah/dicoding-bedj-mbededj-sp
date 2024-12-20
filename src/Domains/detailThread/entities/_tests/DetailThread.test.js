@@ -14,6 +14,7 @@ describe('A DetailThread Entity', () => {
           id: 'comment-1',
           content: 'Comment 1',
           date: new Date(2024, 11, 8, 9, 0, 0).toISOString(),
+          likeCount: 4,
           username: 'foobaz',
           replies: [
             {
@@ -34,6 +35,7 @@ describe('A DetailThread Entity', () => {
           id: 'comment-2',
           content: 'Comment 2',
           date: new Date(2024, 11, 8, 10, 0, 0).toISOString(),
+          likeCount: 2,
           username: 'voobar',
           replies: [
             {
@@ -54,6 +56,7 @@ describe('A DetailThread Entity', () => {
           id: 'comment-3',
           content: '**komentar telah dihapus**',
           date: new Date(2024, 11, 8, 11, 0, 0).toISOString(),
+          likeCount: 0,
           username: 'voobaz',
           replies: [],
         },
@@ -123,6 +126,26 @@ describe('A DetailThread Entity', () => {
           isDelete: true,
           replyCommentId: 'comment-2',
           username: 'voobaz',
+        },
+      ],
+      userThreadCommentsLikes: [
+        {
+          threadCommentId: 'comment-1',
+        },
+        {
+          threadCommentId: 'comment-1',
+        },
+        {
+          threadCommentId: 'comment-1',
+        },
+        {
+          threadCommentId: 'comment-1',
+        },
+        {
+          threadCommentId: 'comment-2',
+        },
+        {
+          threadCommentId: 'comment-2',
         },
       ],
     };
