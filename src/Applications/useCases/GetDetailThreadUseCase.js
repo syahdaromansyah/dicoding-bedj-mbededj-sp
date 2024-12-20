@@ -5,10 +5,12 @@ class GetDetailThreadUseCase {
     threadsRepository,
     threadCommentsRepository,
     threadCommentRepliesRepository,
+    userThreadCommentLikesRepository,
   }) {
     this._threadsRepository = threadsRepository;
     this._threadCommentsRepository = threadCommentsRepository;
     this._threadCommentRepliesRepository = threadCommentRepliesRepository;
+    this._userThreadCommentLikesRepository = userThreadCommentLikesRepository;
   }
 
   async execute(threadId) {
@@ -26,11 +28,15 @@ class GetDetailThreadUseCase {
         threadId,
       );
 
+    const userThreadCommentsLikes =
+      await this._userThreadCommentLikesRepository.getByThreadId(threadId);
+
     return {
       thread: new DetailThreadEntity({
         thread,
         threadComments,
         threadCommentReplies,
+        userThreadCommentsLikes,
       }),
     };
   }

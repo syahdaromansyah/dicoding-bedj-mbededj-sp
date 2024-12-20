@@ -12,6 +12,7 @@ const AuthRepository = require('../Domains/auth/AuthRepository');
 const ThreadsRepository = require('../Domains/threads/ThreadsRepository');
 const ThreadCommentsRepository = require('../Domains/threadComments/ThreadCommentsRepository');
 const ThreadCommentRepliesRepository = require('../Domains/threadCommentReplies/ThreadCommentRepliesRepository');
+const UserThreadCommentLikesRepository = require('../Domains/userThreadCommentLikes/UserThreadCommentLikesRepository');
 
 const PasswordEncryption = require('../Applications/security/PasswordEncryption');
 const CredentialValidation = require('../Applications/security/CredentialValidation');
@@ -29,12 +30,14 @@ const DeleteThreadCommentUseCase = require('../Applications/useCases/DeleteThrea
 const GetDetailThreadUseCase = require('../Applications/useCases/GetDetailThreadUseCase');
 const AddThreadCommentReplyUseCase = require('../Applications/useCases/AddThreadCommentReplyUseCase');
 const DeleteThreadCommentReplyUseCase = require('../Applications/useCases/DeleteThreadCommentReplyUseCase');
+const UserThreadCommentLikeUseCase = require('../Applications/useCases/UserThreadCommentLikeUseCase');
 
 const UsersRepositoryPostgres = require('./repositories/UsersRepositoryPostgres');
 const AuthRepositoryPostgres = require('./repositories/AuthRepositoryPostgres');
 const ThreadsRepositoryPostgres = require('./repositories/ThreadsRepositoryPostgres');
 const ThreadCommentsRepositoryPostgres = require('./repositories/ThreadCommentsRepositoryPostgres');
 const ThreadCommentRepliesRepositoryPostgres = require('./repositories/ThreadCommentRepliesRepositoryPostgres');
+const UserThreadCommentLikesRepositoryPostgres = require('./repositories/UserThreadCommentLikesRepositoryPostgres');
 
 const BcryptPasswordEncryption = require('./security/BcryptPasswordEncryption');
 const CredentialValidationImpl = require('./security/CredentialValidationImpl');
@@ -130,6 +133,20 @@ container.register([
         {
           name: 'date',
           internal: Datetime.name,
+        },
+      ],
+    },
+  },
+  {
+    key: UserThreadCommentLikesRepository.name,
+    Class: UserThreadCommentLikesRepositoryPostgres,
+    parameter: {
+      dependencies: [
+        {
+          concrete: pool,
+        },
+        {
+          internal: IdGenerator.name,
         },
       ],
     },
@@ -317,6 +334,10 @@ container.register([
           name: 'threadCommentRepliesRepository',
           internal: ThreadCommentRepliesRepository.name,
         },
+        {
+          name: 'userThreadCommentLikesRepository',
+          internal: UserThreadCommentLikesRepository.name,
+        },
       ],
     },
   },
@@ -358,6 +379,27 @@ container.register([
         {
           name: 'threadCommentRepliesRepository',
           internal: ThreadCommentRepliesRepository.name,
+        },
+      ],
+    },
+  },
+  {
+    key: UserThreadCommentLikeUseCase.name,
+    Class: UserThreadCommentLikeUseCase,
+    parameter: {
+      injectType: 'destructuring',
+      dependencies: [
+        {
+          name: 'threadsRepository',
+          internal: ThreadsRepository.name,
+        },
+        {
+          name: 'threadCommentsRepository',
+          internal: ThreadCommentsRepository.name,
+        },
+        {
+          name: 'userThreadCommentLikesRepository',
+          internal: UserThreadCommentLikesRepository.name,
         },
       ],
     },
