@@ -27,6 +27,10 @@ class DetailThread {
     let utclCopied = JSON.parse(JSON.stringify(userThreadCommentsLikes));
 
     return threadComments.map((tC) => {
+      const likeCount = utclCopied.filter(
+        (utcl) => utcl.threadCommentId === tC.id,
+      ).length;
+
       utclCopied = utclCopied.filter((utcl) => utcl.threadCommentId !== tC.id);
 
       const replies = tcrCopied
@@ -44,6 +48,7 @@ class DetailThread {
         id: tC.id,
         content: tC.isDelete ? '**komentar telah dihapus**' : tC.content,
         date: tC.date,
+        likeCount,
         username: tC.username,
         replies,
       };
